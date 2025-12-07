@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit.Machine | Authority Video Systems</title>
+    
+    <!-- React Core -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- THE INTERNAL ENGINE (CSS) - NO DOWNLOADS REQUIRED -->
+    <style>
+        :root {
+            --bg: #050505;
+            --surface: #111111;
+            --surface-hover: #1a1a1a;
+            --border: rgba(255, 255, 255, 0.1);
+            --primary: #2563eb;
+            --primary-glow: rgba(37, 99, 235, 0.5);
+            --text-main: #ffffff;
+            --text-muted: #888888;
+            --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: var(--font-main);
+            margin: 0;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Utility Classes */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+        .flex { display: flex; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .justify-center { justify-content: center; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-4 { gap: 1rem; }
+        .text-center { text-align: center; }
+        .hidden-mobile { display: none; }
+        @media (min-width: 768px) { .hidden-mobile { display: flex; } }
+        
+        /* Navigation */
+        nav {
+            position: fixed; top: 0; width: 100%; z-index: 100;
+            background: rgba(5, 5, 5, 0.8); backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+        }
+        .logo { font-weight: 800; font-size: 1.25rem; letter-spacing: -0.05em; }
+        .nav-link { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: color 0.2s; }
+        .nav-link:hover { color: var(--text-main); }
+        .btn {
+            background: var(--text-main); color: black; padding: 0.6rem 1.2rem;
+            border-radius: 8px; font-weight: 700; text-decoration: none;
+            border: none; cursor: pointer; transition: transform 0.2s, opacity 0.2s;
+            display: inline-flex; align-items: center; gap: 0.5rem;
+        }
+        .btn:hover { transform: translateY(-2px); opacity: 0.9; }
+        .btn-outline {
+            background: rgba(255,255,255,0.05); color: white; border: 1px solid var(--border);
+        }
+        .btn-outline:hover { background: rgba(255,255,255,0.1); }
+
+        /* Hero Section */
+        .hero { padding: 160px 0 80px; position: relative; overflow: hidden; }
+        .hero-glow {
+            position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            width: 600px; height: 400px; background: var(--primary);
+            filter: blur(150px); opacity: 0.15; pointer-events: none; z-index: -1;
+        }
+        .badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(37, 99, 235, 0.1); color: #60a5fa;
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            padding: 4px 12px; border-radius: 100px; font-size: 0.75rem; font-weight: 700;
+            margin-bottom: 2rem;
+        }
+        .pulse { width: 8px; height: 8px; background: #60a5fa; border-radius: 50%; box-shadow: 0 0 0 0 rgba(96, 165, 250, 0.7); animation: pulse 2s infinite; }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(96, 165, 250, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(96, 165, 250, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(96, 165, 250, 0); }
+        }
+        h1 {
+            font-size: 3rem; line-height: 1.1; font-weight: 800; margin-bottom: 1.5rem;
+        }
+        @media (min-width: 768px) { h1 { font-size: 4.5rem; } }
+        .text-gradient {
+            background: linear-gradient(to bottom, #ffffff, #888888);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .hero-sub { font-size: 1.1rem; color: var(--text-muted); max-width: 600px; margin: 0 auto 3rem; }
+
+        /* Grid System */
+        .grid-wrapper {
+            display: grid; grid-template-columns: 1fr; gap: 2rem; padding: 4rem 0;
+        }
+        @media (min-width: 768px) { .grid-wrapper { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 1024px) { .grid-wrapper { grid-template-columns: repeat(3, 1fr); } }
+
+        /* Cards */
+        .card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 16px; overflow: hidden; transition: all 0.3s ease;
+            cursor: pointer; position: relative;
+        }
+        .card:hover { transform: translateY(-5px); border-color: rgba(255,255,255,0.3); }
+        .aspect-video {
+            aspect-ratio: 9/16; background: #000; position: relative;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .play-btn {
+            width: 50px; height: 50px; background: rgba(255,255,255,0.2);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            backdrop-filter: blur(4px); transition: transform 0.2s;
+        }
+        .card:hover .play-btn { transform: scale(1.1); background: rgba(255,255,255,0.3); }
+        .card-content { padding: 1.5rem; }
+        .card-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 0.25rem; }
+        .card-type { color: var(--primary); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .card-desc { color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem; }
+
+        /* Verified Badge */
+        .verified-tag {
+            position: absolute; top: 10px; right: 10px;
+            background: var(--primary); color: white; font-size: 10px; font-weight: 800;
+            padding: 4px 8px; border-radius: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        /* Section Headers */
+        .section-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
+        
+        /* Tabs */
+        .tabs { background: rgba(255,255,255,0.05); padding: 4px; border-radius: 8px; display: inline-flex; gap: 4px; }
+        .tab-btn { background: transparent; color: var(--text-muted); border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; }
+        .tab-btn.active { background: var(--text-main); color: black; }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px);
+            z-index: 200; display: flex; align-items: center; justify-content: center; padding: 1rem;
+        }
+        .modal-content {
+            background: var(--surface); border: 1px solid var(--border);
+            width: 100%; max-width: 400px; border-radius: 20px; overflow: hidden;
+            position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        .close-btn {
+            position: absolute; top: 1rem; right: 1rem; color: white; background: none; border: none; cursor: pointer; z-index: 10;
+        }
+
+        /* Pricing */
+        .pricing-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; margin-top: 3rem; }
+        @media (min-width: 768px) { .pricing-grid { grid-template-columns: 1fr 1fr; } }
+        .price-card {
+            background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+            padding: 2rem; border-radius: 20px; position: relative;
+        }
+        .price-card.highlight { border-color: var(--primary); background: rgba(37, 99, 235, 0.05); }
+        .price-tag { font-size: 2.5rem; font-weight: 800; margin: 1rem 0; }
+        .price-tag span { font-size: 1rem; color: var(--text-muted); font-weight: 400; }
+        .feature-list { list-style: none; padding: 0; margin: 2rem 0; }
+        .feature-item { display: flex; gap: 10px; font-size: 0.9rem; color: var(--text-main); margin-bottom: 0.8rem; }
+        .check { color: var(--primary); }
+
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // --- Icons (Built-in) ---
+        const Icon = ({ d, className, fill = "none", stroke = "currentColor" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill={fill} stroke={stroke} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <path d={d} />
+            </svg>
+        );
+        const PlayIcon = () => <Icon d="M5 3l14 9-14 9V3z" fill="currentColor" stroke="none" />;
+        const CheckIcon = () => <Icon d="M22 11.08V12a10 10 0 1 1-5.93-9.14 M22 4L12 14.01l-3-3" />;
+        const CloseIcon = () => <Icon d="M18 6L6 18M6 6l12 12" />;
+        const ZapIcon = () => <Icon d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="currentColor" stroke="none" />;
+        const ArrowRight = () => <Icon d="M5 12h14M12 5l7 7-7 7" />;
+
+        const App = () => {
+            const [activeTab, setActiveTab] = useState('all');
+            const [selectedProject, setSelectedProject] = useState(null);
+            const [topic, setTopic] = useState('');
+
+            // DATA
+            const portfolioItems = [
+                { id: 1, title: "The Real Estate Pod", client: "Verified Client", category: "client", style: "The Value Clip", desc: "Middle-of-funnel education to drive booked calls.", color: "#1e3a8a" },
+                { id: 2, title: "SaaS Founder Logic", client: "Strategy Concept", category: "concept", style: "The Human Moment", desc: "High-trust storytelling for founder branding.", color: "#064e3b" },
+                { id: 3, title: "Crypto Market Update", client: "Strategy Concept", category: "concept", style: "The Viral Hook", desc: "Fast-paced editing to capture Top-of-Funnel attention.", color: "#581c87" },
+                { id: 4, title: "Leadership Principles", client: "Strategy Concept", category: "concept", style: "The Human Moment", desc: "Minimalist editing focusing on the message.", color: "#7c2d12" },
+                { id: 5, title: "Tech Product Launch", client: "Strategy Concept", category: "concept", style: "The Value Clip", desc: "Motion graphics heavy to explain complex features.", color: "#881337" },
+                { id: 6, title: "Agency Growth Tips", client: "Strategy Concept", category: "concept", style: "The Viral Hook", desc: "Dynamic captions and sound design for retention.", color: "#312e81" }
+            ];
+
+            const filteredItems = activeTab === 'all' ? portfolioItems : portfolioItems.filter(item => item.category === activeTab);
+
+            return (
+                <div>
+                    {/* Navbar */}
+                    <nav>
+                        <div className="container flex justify-between items-center">
+                            <div className="logo flex items-center gap-2">
+                                <span style={{color: '#2563eb'}}><ZapIcon /></span> EDIT.MACHINE
+                            </div>
+                            <div className="hidden-mobile gap-4">
+                                <a href="#work" className="nav-link">Portfolio</a>
+                                <a href="#pricing" className="nav-link">Packages</a>
+                                <a href="#contact" className="btn">Book Call</a>
+                            </div>
+                        </div>
+                    </nav>
+
+                    {/* Hero */}
+                    <section className="hero">
+                        <div className="hero-glow"></div>
+                        <div className="container text-center">
+                            <div className="badge">
+                                <div className="pulse"></div> ACCEPTING CLIENTS FOR Q4
+                            </div>
+                            <h1>Make your content <br /> <span className="text-gradient">an unfair advantage.</span></h1>
+                            <p className="hero-sub">I build high-performance video systems for B2B Founders and Podcasters. No trends. No brain rot. Just revenue.</p>
+                            <div className="flex justify-center gap-4">
+                                <a href="#work" className="btn">View Work <ArrowRight /></a>
+                                <a href="#pricing" className="btn btn-outline">View Packages</a>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Work Section */}
+                    <section id="work" className="container">
+                        <div className="section-header">
+                            <div>
+                                <h2 style={{fontSize: '2rem', margin: 0}}>Selected Projects</h2>
+                                <p style={{color: '#888', margin: 0}}>Categorized by strategic intent.</p>
+                            </div>
+                            <div className="tabs">
+                                <button className={`tab-btn ${activeTab === 'all' ? 'active' : ''}`} onClick={() => setActiveTab('all')}>ALL</button>
+                                <button className={`tab-btn ${activeTab === 'client' ? 'active' : ''}`} onClick={() => setActiveTab('client')}>VERIFIED</button>
+                                <button className={`tab-btn ${activeTab === 'concept' ? 'active' : ''}`} onClick={() => setActiveTab('concept')}>CONCEPTS</button>
+                            </div>
+                        </div>
+
+                        <div className="grid-wrapper">
+                            {filteredItems.map(item => (
+                                <div key={item.id} className="card" onClick={() => setSelectedProject(item)}>
+                                    <div className="aspect-video" style={{background: `linear-gradient(45deg, #000, ${item.color})`}}>
+                                        <div className="play-btn"><PlayIcon /></div>
+                                        {item.category === 'client' && <div className="verified-tag">VERIFIED</div>}
+                                    </div>
+                                    <div className="card-content">
+                                        <div className="card-title">{item.title}</div>
+                                        <div className="card-type">{item.style}</div>
+                                        <div className="card-desc">{item.desc}</div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+
+                    {/* Modal */}
+                    {selectedProject && (
+                        <div className="modal-overlay" onClick={() => setSelectedProject(null)}>
+                            <div className="modal-content" onClick={e => e.stopPropagation()}>
+                                <button className="close-btn" onClick={() => setSelectedProject(null)}><CloseIcon /></button>
+                                <div className="aspect-video" style={{background: `linear-gradient(45deg, #000, ${selectedProject.color})`}}>
+                                    <PlayIcon />
+                                </div>
+                                <div className="card-content">
+                                    <h3>{selectedProject.title}</h3>
+                                    <p>{selectedProject.desc}</p>
+                                    <button className="btn" style={{width: '100%', justifyContent: 'center', marginTop: '1rem'}}>I Want a Video Like This</button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Pricing */}
+                    <section id="pricing" className="container" style={{paddingTop: '4rem', paddingBottom: '4rem'}}>
+                        <h2 className="text-center" style={{fontSize: '2.5rem'}}>Partnership Tiers</h2>
+                        <div className="pricing-grid">
+                            <div className="price-card">
+                                <h3>The Accelerator</h3>
+                                <div className="price-tag">$800<span>/mo</span></div>
+                                <ul className="feature-list">
+                                    <li className="feature-item"><span className="check"><CheckIcon/></span> 8 High-Retention Shorts</li>
+                                    <li className="feature-item"><span className="check"><CheckIcon/></span> Unlimited Revisions</li>
+                                    <li className="feature-item"><span className="check"><CheckIcon/></span> 48h Turnaround</li>
+                                </ul>
+                                <button className="btn btn-outline" style={{width: '100%', justifyContent: 'center'}}>Select Accelerator</button>
+                            </div>
+                            <div className="price-card highlight">
+                                <div className="verified-tag" style={{top:0, right:0, borderRadius: '0 0 0 10px'}}>RECOMMENDED</div>
+                                <h3>The Authority</h3>
+                                <div className="price-tag">$1,600<span>/mo</span></div>
+                                <ul className="feature-list">
+                                    <li className="feature-item"><span className="check"><CheckIcon/></span> 15 High-Retention Shorts</li>
+                                    <li className="feature-item"><span className="check"><CheckIcon/></span> <strong>1 Long-Form Anchor Video</strong></li>
+                                    <li className="feature-item"><span className="check"><CheckIcon/></span> Strategy Session</li>
+                                </ul>
+                                <button className="btn" style={{width: '100%', justifyContent: 'center', background: '#2563eb', color: 'white'}}>Apply for Partnership</button>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
